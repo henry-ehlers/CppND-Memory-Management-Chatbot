@@ -45,6 +45,41 @@ ChatBot::~ChatBot()
 //// STUDENT CODE
 ////
 
+// MOVE CONSTRUCTOR 
+// Avoid using expensive copying / temp variables by simple assigning rvalues to rvalue ref.
+ChatBot::ChatBot(ChatBot&& source) {
+  std::cout << "CONSTRUCTION USING RVALUE REFERENCE";
+  this->SetCurrentNode( source.GetCurrentNode() );
+  this->SetRootNode( source.GetRootNode() );
+  this->SetChatLogicHandle( source.GetChatLogicHandle() );
+  this->SetImageHandle( source.GetImageHandle() );
+}
+
+// COPY CONSTRUCTOR
+// COPIES CONTENTS OF ONE INSTANCE TO ANOTHER
+ChatBot::ChatBot(const ChatBot &source) {
+  std::cout << "CONSTRUCTION USING COPY";
+  this->SetCurrentNode( source.GetCurrentNode() );
+  this->SetRootNode( source.GetRootNode() );
+  this->SetChatLogicHandle( source.GetChatLogicHandle() );
+  this->SetImageHandle( source.GetImageHandle() );
+}
+
+// MOVE ASSIGNMENT
+// TRANSFER OWNERSHIP FROM ONE INSTANCE TO ANOTHER (i.e. ONLY THE _IMAGE)q
+ChatBot & ChatBot::operator=(const ChatBot &source) {
+  std::cout << "ASSIGNMENT OF CHATBOT using =";
+  if (this == &source) {
+    return *this;
+  };
+  this->SetCurrentNode( source.GetCurrentNode() );
+  this->SetRootNode( source.GetRootNode() );
+  this->SetChatLogicHandle( source.GetChatLogicHandle() );
+  this->SetImageHandle( source.GetImageHandle() );
+  delete source._image;
+  return * this;
+}
+
 ////
 //// EOF STUDENT CODE
 
