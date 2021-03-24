@@ -11,6 +11,7 @@
 // constructor WITHOUT memory allocation
 ChatBot::ChatBot()
 {
+  	std::cout << "CHATBOT EMPTY CONSTRUCTED\n";
     // invalidate data handles
     _image = nullptr;
     _chatLogic = nullptr;
@@ -20,7 +21,7 @@ ChatBot::ChatBot()
 // constructor WITH memory allocation
 ChatBot::ChatBot(std::string filename)
 {
-    std::cout << "ChatBot Constructor" << std::endl;
+    std::cout << "CHATBOT NON_EMPTY CONSTRUCTED\n";
     
     // invalidate data handles
     _chatLogic = nullptr;
@@ -32,7 +33,7 @@ ChatBot::ChatBot(std::string filename)
 
 ChatBot::~ChatBot()
 {
-    std::cout << "ChatBot Destructor" << std::endl;
+    std::cout << "CHATBOT DESTRUCTOR\n";
 
     // deallocate heap memory
     if(_image != NULL) // Attention: wxWidgets used NULL and not nullptr
@@ -47,36 +48,58 @@ ChatBot::~ChatBot()
 
 // MOVE CONSTRUCTOR 
 // Avoid using expensive copying / temp variables by simple assigning rvalues to rvalue ref.
-ChatBot::ChatBot(ChatBot&& source) {
-  std::cout << "CHATBOT CONSTRUCTION USING RVALUE REFERENCE\n";
-  this->SetCurrentNode( source.GetCurrentNode() );
-  this->SetRootNode( source.GetRootNode() );
-  this->SetChatLogicHandle( source.GetChatLogicHandle() );
-  this->SetImageHandle( source.GetImageHandle() );
+ChatBot::ChatBot(ChatBot && source) {
+  std::cout << "CHATBOT MOVE CONSTRUCTION\n";
+  
+  // Assign stuff WITHOUT GETTERS since that breaks stuff
+  this->_currentNode = source._currentNode;
+  this->_rootNode = source._rootNode;
+  this->_chatLogic = source._chatLogic;
+  this->_chatLogic->SetChatbotHandle(this);
+  this->_image = source._image;
+  
+  // MAKE sure the image is null
+  source._image = NULL;
 }
 
 // COPY CONSTRUCTOR
 // COPIES CONTENTS OF ONE INSTANCE TO ANOTHER
-ChatBot::ChatBot(const ChatBot &source) {
-  std::cout << "CHATBOT CONSTRUCTION USING COPY\n";
+ChatBot::ChatBot(const ChatBot & source) {
+  std::cout << "CHATBOT COPY CONSTRUCTER\n";
   this->SetCurrentNode( source.GetCurrentNode() );
   this->SetRootNode( source.GetRootNode() );
   this->SetChatLogicHandle( source.GetChatLogicHandle() );
   this->SetImageHandle( source.GetImageHandle() );
 }
 
-// MOVE ASSIGNMENT
+// COPY ASSIGNMENT
 // TRANSFER OWNERSHIP FROM ONE INSTANCE TO ANOTHER (i.e. ONLY THE _IMAGE)
 ChatBot & ChatBot::operator=(const ChatBot &source) {
-  std::cout << "CHATBOT ASSIGNED USING =\n";
+  std::cout << "CHATBOT COPY ASSIGNMENT\n";
   // FROM EXPLANATION OF MOVE SOMANTICS
   if (this == &source) {return *this;};
-  delete this->_image;
+  
+  // SET STUFF TO SOURCE WITHOUT REMOVING IMAGE
   this->SetCurrentNode( source.GetCurrentNode() );
   this->SetRootNode( source.GetRootNode() );
   this->SetChatLogicHandle( source.GetChatLogicHandle() );
-  this->SetImageHandle( source.GetImageHandle() );
-  delete source._image;
+  this->_image = source._image;
+
+  return * this;
+}
+
+// MOVE ASSIGNMENT
+ChatBot & ChatBot::operator=(ChatBot &&source) {
+  if (this == &source) {return *this;};
+  std::cout << "CHATBOT MOVE ASSIGNMENT\n";
+  
+  this->_currentNode = source._currentNode;
+  this->_rootNode = source._rootNode;
+  this->_chatLogic = source._chatLogic;
+  this->_chatLogic->SetChatbotHandle(this);
+  this->_image = source._image;
+  source._image = NULL;
+
   return * this;
 }
 
@@ -117,25 +140,19 @@ void ChatBot::ReceiveMessageFromUser(std::string message)
     _currentNode->MoveChatbotToNewNode(newNode);
 }
 
-void ChatBot::SetCurrentNode(GraphNode *node)
+void ChatBot::SetCurrentNode(GraphNode * node)
 {
     // update pointer to current node
-  	std::cout << "UPDATING CHATBOT's CURRENT NODE\n";
     _currentNode = node;
-	std::cout << "1\n";
   
     // select a random node answer (if several answers should exist)
     std::vector<std::string> answers = _currentNode->GetAnswers();
-  	std::cout << "2\n";
     std::mt19937 generator(int(std::time(0)));
-  	std::cout << "3\n";
     std::uniform_int_distribution<int> dis(0, answers.size() - 1);
-  	std::cout << "4\n";
     std::string answer = answers.at(dis(generator));
-	std::cout << "5\n";
+  
     // send selected node answer to user
     _chatLogic->SendMessageToUser(answer);
-  	std::cout << "6\n";
 }
 
 int ChatBot::ComputeLevenshteinDistance(std::string s1, std::string s2)

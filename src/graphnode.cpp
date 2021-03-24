@@ -2,9 +2,9 @@
 #include "graphnode.h"
 #include <iostream>
 #include <memory>
+
 GraphNode::GraphNode(int id)
 {
- 	std::cout << "GRAPH NODE CONSTRUCTOR OF: " << id << "\n";
     _id = id;
 }
 
@@ -12,17 +12,14 @@ GraphNode::~GraphNode()
 {
     //// STUDENT CODE
     ////
-    std::cout << "GRAPH NODE DESTRUCTOR\n";
-    for (std::unique_ptr<GraphEdge> &edge : _childEdges) {
-      // CALLS DESTRUCTOR ON OBJECT BEING MANAGED + RELEASES POINTER
-      std::cout << "graph edge (1): " << edge.get() << "\n";
-      edge.reset(); 
-      std::cout << "graph edge (2): " << edge.get() << "\n";
-    }
-  
-  	if (_chatBot != nullptr) {
-      _chatBot.reset();
-    }
+
+//     for (std::unique_ptr<GraphEdge> &edge : _childEdges) {
+//       // CALLS DESTRUCTOR ON OBJECT BEING MANAGED + RELEASES POINTER
+//       std::cout << "graph edge (1): " << edge.get() << "\n";
+//       edge.reset(); 
+//       std::cout << "graph edge (2): " << edge.get() << "\n";
+//     }
+
     ////
     //// EOF STUDENT CODE
 }
@@ -48,18 +45,16 @@ void GraphNode::AddEdgeToChildNode(std::unique_ptr<GraphEdge> edge)
 
 //// STUDENT CODE
 ////
-void GraphNode::MoveChatbotHere(std::unique_ptr<ChatBot> chatbot)
+void GraphNode::MoveChatbotHere(ChatBot chatbot)
 {
     _chatBot = std::move(chatbot);
-    std::cout << "MOVED CHATBOT (UNIQUE_PTR):" << _chatBot.get() << "\n";
-    _chatBot.get()->SetCurrentNode(this);
+    _chatBot.SetCurrentNode(this);
 }
 
-void GraphNode::MoveChatbotToNewNode(GraphNode *newNode)
+void GraphNode::MoveChatbotToNewNode(GraphNode * newNode)
 {
     newNode->MoveChatbotHere(std::move(_chatBot));
-    _chatBot = nullptr; // invalidate pointer at source
-    if(_chatBot) {std::cout << "CHAT BOT NOT PROPERLY REMOVED\n";};
+    //_chatBot = NULL; // invalidate pointer at source
 }
 ////
 //// EOF STUDENT CODE

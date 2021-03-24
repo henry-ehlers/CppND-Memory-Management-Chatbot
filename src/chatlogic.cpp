@@ -26,18 +26,14 @@ ChatLogic::~ChatLogic()
 {
     //// STUDENT CODE
     ////
-    std::cout << "CHAT LOGIC DESTRUCTOR.\n";
 
-    // delete all nodes
-    std::cout << "LEN NODES: " << _nodes.size() << "\n";
-    for (std::unique_ptr<GraphNode>& it : _nodes)
-    {
-      std::cout << "node " << it.get() << " to be deleted\n";
-      //delete it.get();
+
+	// delete all nodes
+    for (std::unique_ptr<GraphNode>& it : _nodes){
       it.reset();
     }
 
-    // delete all edges
+    // delete all edges (not anymore)
   	// NODES NOW HAVE OWNERSHIP OF EDGES, SO THIS MUST GO
 //     std::cout << "LEN EDGES: " << _edges.size() << "\n";
 //     for (std::unique_ptr<GraphEdge>& it : _edges)
@@ -92,7 +88,7 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
 {
     // load file with answer graph elements
     std::ifstream file(filename);
-
+	//std::cout << "LOAD FILE\n";
     // check for file availability and process it line by line
     if (file)
     {
@@ -132,6 +128,7 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
                                      [](const std::pair<std::string, std::string> &pair) { 
                                        return pair.first == "TYPE"; 
                                      });
+
             if (type != tokens.end())
             {
                 // check for id
@@ -159,14 +156,13 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
                                                     [&id](std::unique_ptr<GraphNode> &node) { 
                                                       return node->GetID() == id; 
                                                     });
-                      
                         // create new element if ID does not yet exist
                         if (newNode == _nodes.end())
                         {
                           	// FROM: https://knowledge.udacity.com/questions/120851
                             _nodes.emplace_back(std::make_unique<GraphNode>(id));
                             newNode = _nodes.end() - 1; // get iterator to last element
-
+	
                             // add all answers to current node
                             AddAllTokensToElement("ANSWER", tokens, **newNode);
                         }
@@ -178,7 +174,6 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
                     // edge-based processing
                     if (type->second == "EDGE")
                     {
-                      
                         //// STUDENT CODE
                         ////
 
@@ -248,6 +243,7 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
         } // eof loop over all lines in the file
 
         file.close();
+      	//std::cout << "FILE LOADED\n";
 
     } // eof check for file availability
     else
@@ -282,20 +278,17 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
     }
 	
   	// ADD CHaT BOT HERE
-  	
   	// create instance of chatbot using UNIQUE POINTER
-    std::unique_ptr<ChatBot> chatBot;
-  	chatBot = std::make_unique<ChatBot>("../images/chatbot.png");
-  	chatBot.get()->SetChatLogicHandle(this); //IMPORTANT ADDITION SINCE OTHERWISE WE HIT A SEG.FAULT.
+    ChatBot chatBot = ChatBot("../images/chatbot.png");
+  	chatBot.SetChatLogicHandle(this); //IMPORTANT ADDITION SINCE OTHERWISE WE HIT A SEG.FAULT.
   
   	// PASS POINTER (BUT NOT OWNERSHIP) OF CHATBOT TO CHATLOCI
-  	SetChatbotHandle(chatBot.get());
+  	_chatBot = &chatBot;
   
-    // add chatbot to graph root node
-    chatBot.get()->SetRootNode(rootNode);
+  	// add chatbot to graph root node
+    _chatBot->SetRootNode(rootNode);
     rootNode->MoveChatbotHere(std::move(chatBot));
-    std::cout << "SUCCESFULLY MOVED BOT";
-  
+ 
     ////
     //// EOF STUDENT CODE
 }

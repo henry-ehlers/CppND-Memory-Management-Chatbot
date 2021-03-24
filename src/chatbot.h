@@ -29,22 +29,23 @@ public:
 
     //// STUDENT CODE
     ////
-	ChatBot& operator=(const ChatBot &source);
-    ChatBot(const ChatBot &source);
-    ChatBot(ChatBot&& source);
+	ChatBot& operator=(const ChatBot & source); // Copy Assignment
+    ChatBot(const ChatBot & source); // Copy
+    ChatBot(ChatBot && source); // Move
+    ChatBot& operator=(ChatBot && source); // Move Assignment
     ////
     //// EOF STUDENT CODE
 
     // getters / setters
     void SetCurrentNode(GraphNode *node);
     void SetRootNode(GraphNode *rootNode) { _rootNode = rootNode; };
-    void SetChatLogicHandle(ChatLogic *chatLogic) { _chatLogic = chatLogic; };
+    void SetChatLogicHandle(ChatLogic * chatLogic) { _chatLogic = chatLogic; };
     void SetImageHandle(wxBitmap * image) {_image = image;};
     
-    wxBitmap *GetImageHandle() const { return _image; };
-    GraphNode* GetCurrentNode() const {return _currentNode;};
-    GraphNode* GetRootNode() const {return _rootNode;}
-    ChatLogic* GetChatLogicHandle() const {return _chatLogic;};
+    wxBitmap  * GetImageHandle() const { return _image; };
+    GraphNode * GetCurrentNode() const {return _currentNode;};
+    GraphNode * GetRootNode() const {return _rootNode;}
+    ChatLogic * GetChatLogicHandle() const {return _chatLogic;};
     
 
     // communication
