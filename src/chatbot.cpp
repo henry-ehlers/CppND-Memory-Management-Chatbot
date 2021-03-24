@@ -48,7 +48,7 @@ ChatBot::~ChatBot()
 // MOVE CONSTRUCTOR 
 // Avoid using expensive copying / temp variables by simple assigning rvalues to rvalue ref.
 ChatBot::ChatBot(ChatBot&& source) {
-  std::cout << "CONSTRUCTION USING RVALUE REFERENCE";
+  std::cout << "CHATBOT CONSTRUCTION USING RVALUE REFERENCE\n";
   this->SetCurrentNode( source.GetCurrentNode() );
   this->SetRootNode( source.GetRootNode() );
   this->SetChatLogicHandle( source.GetChatLogicHandle() );
@@ -58,7 +58,7 @@ ChatBot::ChatBot(ChatBot&& source) {
 // COPY CONSTRUCTOR
 // COPIES CONTENTS OF ONE INSTANCE TO ANOTHER
 ChatBot::ChatBot(const ChatBot &source) {
-  std::cout << "CONSTRUCTION USING COPY";
+  std::cout << "CHATBOT CONSTRUCTION USING COPY\n";
   this->SetCurrentNode( source.GetCurrentNode() );
   this->SetRootNode( source.GetRootNode() );
   this->SetChatLogicHandle( source.GetChatLogicHandle() );
@@ -66,12 +66,12 @@ ChatBot::ChatBot(const ChatBot &source) {
 }
 
 // MOVE ASSIGNMENT
-// TRANSFER OWNERSHIP FROM ONE INSTANCE TO ANOTHER (i.e. ONLY THE _IMAGE)q
+// TRANSFER OWNERSHIP FROM ONE INSTANCE TO ANOTHER (i.e. ONLY THE _IMAGE)
 ChatBot & ChatBot::operator=(const ChatBot &source) {
-  std::cout << "ASSIGNMENT OF CHATBOT using =";
-  if (this == &source) {
-    return *this;
-  };
+  std::cout << "CHATBOT ASSIGNED USING =\n";
+  // FROM EXPLANATION OF MOVE SOMANTICS
+  if (this == &source) {return *this;};
+  delete this->_image;
   this->SetCurrentNode( source.GetCurrentNode() );
   this->SetRootNode( source.GetRootNode() );
   this->SetChatLogicHandle( source.GetChatLogicHandle() );
@@ -120,16 +120,22 @@ void ChatBot::ReceiveMessageFromUser(std::string message)
 void ChatBot::SetCurrentNode(GraphNode *node)
 {
     // update pointer to current node
+  	std::cout << "UPDATING CHATBOT's CURRENT NODE\n";
     _currentNode = node;
-
+	std::cout << "1\n";
+  
     // select a random node answer (if several answers should exist)
     std::vector<std::string> answers = _currentNode->GetAnswers();
+  	std::cout << "2\n";
     std::mt19937 generator(int(std::time(0)));
+  	std::cout << "3\n";
     std::uniform_int_distribution<int> dis(0, answers.size() - 1);
+  	std::cout << "4\n";
     std::string answer = answers.at(dis(generator));
-
+	std::cout << "5\n";
     // send selected node answer to user
     _chatLogic->SendMessageToUser(answer);
+  	std::cout << "6\n";
 }
 
 int ChatBot::ComputeLevenshteinDistance(std::string s1, std::string s2)

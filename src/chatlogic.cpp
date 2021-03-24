@@ -17,11 +17,6 @@ ChatLogic::ChatLogic()
     //// STUDENT CODE
     ////
 
-    // create instance of chatbot
-    _chatBot = new ChatBot("../images/chatbot.png");
-
-    // add pointer to chatlogic so that chatbot answers can be passed on to the GUI
-    _chatBot->SetChatLogicHandle(this);
 
     ////
     //// EOF STUDENT CODE
@@ -37,7 +32,7 @@ ChatLogic::~ChatLogic()
     std::cout << "LEN NODES: " << _nodes.size() << "\n";
     for (std::unique_ptr<GraphNode>& it : _nodes)
     {
-      std::cout << it.get();
+      std::cout << "node " << it.get() << " to be deleted\n";
       //delete it.get();
       it.reset();
     }
@@ -53,9 +48,9 @@ ChatLogic::~ChatLogic()
 //     }
 
     // delete chatbot instance
-    if (_chatBot != nullptr) {
-        delete _chatBot;
-    }
+//     if (_chatBot != nullptr) {
+//         delete _chatBot;
+//     }
     
 
     ////
@@ -285,11 +280,22 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename)
             }
         }
     }
-
+	
+  	// ADD CHaT BOT HERE
+  	
+  	// create instance of chatbot using UNIQUE POINTER
+    std::unique_ptr<ChatBot> chatBot;
+  	chatBot = std::make_unique<ChatBot>("../images/chatbot.png");
+  	chatBot.get()->SetChatLogicHandle(this); //IMPORTANT ADDITION SINCE OTHERWISE WE HIT A SEG.FAULT.
+  
+  	// PASS POINTER (BUT NOT OWNERSHIP) OF CHATBOT TO CHATLOCI
+  	SetChatbotHandle(chatBot.get());
+  
     // add chatbot to graph root node
-    _chatBot->SetRootNode(rootNode);
-    rootNode->MoveChatbotHere(_chatBot);
-    
+    chatBot.get()->SetRootNode(rootNode);
+    rootNode->MoveChatbotHere(std::move(chatBot));
+    std::cout << "SUCCESFULLY MOVED BOT";
+  
     ////
     //// EOF STUDENT CODE
 }
